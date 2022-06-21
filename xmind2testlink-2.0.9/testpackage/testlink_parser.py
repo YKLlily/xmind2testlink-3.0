@@ -70,7 +70,6 @@ def to_testlink_xml_content(testsuite):
 
     for suite in testsuite.sub_suites:
         assert isinstance(suite, TestSuite)
-
         if should_skip(suite.name):
             continue
 
@@ -78,6 +77,13 @@ def to_testlink_xml_content(testsuite):
         suite_element.set(Attributes.name, suite.name)
         build_text_field(suite_element, Tags.details, suite.details)
         build_testcase_xml(suite, suite_element)
+
+        while suite.sub_suites:
+            for sub_suite in suite.sub_suites:
+                sub_suite_element = SubElement(suite_element, Tags.testsuite)
+                sub_suite_element.set(Attributes.name,sub_suite.name)
+                build_text_field(sub_suite_element, Tags.details, sub_suite.details)
+                build_testcase_xml(sub_suite,sub_suite_element)
 
     tree = ElementTree.ElementTree(root_suite)
     f = BytesIO()
@@ -87,6 +93,13 @@ def to_testlink_xml_content(testsuite):
 
 def build_text_field(element, tag, value):
     if should_parse(value):
+        #先画出当前子节点
+        # e = SubElement(element, tag)
+        # #如果还有子节点，继续调用这个方法
+        # while parent_suite.sub_suites:
+        #     for sub_suite in parent_suite.sub_suites:
+        #         build_text_field(sub_suite, e, tag, sub_suite.details)
+        # set_text(e, value)
         e = SubElement(element, tag)
         set_text(e, value)
 

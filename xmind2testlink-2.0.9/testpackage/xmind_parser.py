@@ -4,9 +4,9 @@ Module to parse xmind file into test suite and test case objects.
 
 import sharedparser as __
 from datatype import TestSuite
-from mytest import is_summary
-from mytest import is_predict
-from mytest import get_titles_params
+from get_testcase_as_comments import is_summary
+from get_testcase_as_comments import *
+from get_testcase_as_comments import get_titles_params
 
 
 def xmind_to_flat_dict(xmind_file):
@@ -27,19 +27,37 @@ def xmind_to_suite(xmind_file):
         return xmind_to_suite_v1(xmind_file)
 
 
+"""
+在V1版本中修改，支持随意的添加module
+支持输入概要以及前提内容
+支持预期结果多个并且在xmind中是多条的展示
+"""
+
+
 def xmind_to_suite_v1(xmind_file):
     print("v1")
 
+    # 解析子节点，且入参是字典类型
     def parse_suite(suite_dict):
         suite = TestSuite()
         suite.name = suite_dict['title']
         suite.details = suite_dict['note']
+        suite.sub_suites = []
         suite.testcase_list = []
         testcase_topics = suite_dict.get('topics', [])
 
         for _ in testcase_topics:
-            t = __.parse_testcase(_)
-            suite.testcase_list.append(t)
+            # 如果子节点有说明性节点，则放入当前节点的details中
+            if is_summary(_):
+                suite.details = get_titles_params(_)
+            # 如果子节点是自定义的模块，那就是需要再增加suite
+            elif is_self_suite(_):
+                # s = parse_suite(_)
+                suite.sub_suites.append(parse_suite(_))
+            # 正常解析测试用例，并且将用例加到当前节点的测试用例中
+            else:
+                t = __.parse_testcase(_)
+                suite.testcase_list.append(t)
 
         return suite
 
@@ -48,16 +66,19 @@ def xmind_to_suite_v1(xmind_file):
 
     suite = TestSuite()
     suite.sub_suites = []
+    suite.name = root.get('title')
 
     for _ in root['topics']:
-        suite.sub_suites.append(parse_suite(_))
+        # 判断当前节点是否是说明性节点,若是，则加到根目录的说明性文件中，如果否，则加到子节点中
+        if is_summary(_):
+            suite.details = get_titles_params(_)
+        else:
+            suite.sub_suites.append(parse_suite(_))
 
     return suite
 
 
 def xmind_to_suite_v2(xmind_file):
-    print("v2")
-
     def parse_testcase_list(cases_dict, parent=None):
 
         if __.is_testcase_topic(cases_dict):

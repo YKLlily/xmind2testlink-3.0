@@ -2,6 +2,8 @@ from xmindparser import xmind_to_dict, config
 
 from datatype import TestCase, TestStep, cache
 
+from get_testcase_as_comments import *
+
 config['hideEmptyValue'] = False
 _config = {'sep': ' ',
            'valid_sep': '/>-+',
@@ -190,7 +192,7 @@ def parse_step(step_dict):
     #     step.expected = expected_node[0]['title']
     if expected_node:
         for result in expected_node:
-            i=i+1
+            i = i + 1
             results = results + "预期结果" + str(i) + result.get("title") + "<br />"
         step.expected = results
     return step
@@ -215,11 +217,34 @@ def parse_testcase(testcase_dict, parent=None):
     testcase.summary = build_testcase_summary(nodes)
     testcase.preconditions = build_testcase_precondition(nodes)
     testcase.importance = get_priority(testcase_dict)
+    testcase.steps = []
 
     testcase.execution_type = get_execution_type(testcase_dict)
+
     steps_node = testcase_dict.get('topics', None)
 
     if steps_node:
-        testcase.steps = parse_steps(steps_node)
+        step_num=1
+        for step in steps_node:
+            if is_summary(step):
+                testcase.summary = get_titles_params(step)
+            elif is_predict(step):
+                testcase.preconditions = get_titles_params(step)
+            else:
+                #testcase.steps = parse_steps(steps_node)
+                testcase.steps.append(parse_step(step))
+                testcase.steps[step_num - 1].number = step_num
+                step_num = step_num + 1
 
     return testcase
+
+
+"""
+入参：字典
+"""
+
+
+def build_suite_name(suite):
+    t = suite.get('title')
+    result = t.replace("module", '')
+    return result
