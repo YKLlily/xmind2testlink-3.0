@@ -12,6 +12,7 @@ from xml.sax.saxutils import escape
 from xml.dom import minidom
 
 from datatype import TestStep, TestSuite, TestCase, cache
+from sharedparser import build_suite_name
 
 
 class Tags():
@@ -76,9 +77,9 @@ def to_testlink_xml_content(testsuite):
         suite_element = SubElement(root_suite, Tags.testsuite)
         suite_element.set(Attributes.name, suite.name)
         build_text_field(suite_element, Tags.details, suite.details)
-        build_testcase_xml(suite, suite_element)
+        build_testcase_xml(build_suite_name(suite), suite_element)
 
-        while suite.sub_suites:
+        if suite.sub_suites:
             for sub_suite in suite.sub_suites:
                 sub_suite_element = SubElement(suite_element, Tags.testsuite)
                 sub_suite_element.set(Attributes.name,sub_suite.name)

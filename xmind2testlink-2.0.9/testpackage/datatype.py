@@ -1,8 +1,23 @@
 class TestSuite():
-    sub_suites = None
-    name = ""
-    details = ""
-    testcase_list = None
+    def change_name(self, name):
+        self.name=name
+
+    def __init__(self, name="", details="", sub_suites=[], testcase_list=[]):
+        self.name = name
+        self.details = details
+        if sub_suites:
+            self.sub_suites = sub_suites
+        else:
+            self.sub_suites = []
+        if testcase_list:
+            self.testcase_list = testcase_list
+        else:
+            self.testcase_list = []
+
+    # sub_suites = None
+    # name = ""
+    # details = ""
+    # testcase_list = None
 
     def to_dict(self):
         me = {'name': self.name,

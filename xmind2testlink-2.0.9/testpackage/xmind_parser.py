@@ -4,9 +4,9 @@ Module to parse xmind file into test suite and test case objects.
 
 import sharedparser as __
 from datatype import TestSuite
-from get_testcase_as_comments import is_summary
-from get_testcase_as_comments import *
-from get_testcase_as_comments import get_titles_params
+from get_comments import is_summary
+from get_comments import *
+from get_comments import get_titles_params
 
 
 def xmind_to_flat_dict(xmind_file):
@@ -76,6 +76,14 @@ def xmind_to_suite_v1(xmind_file):
             suite.sub_suites.append(parse_suite(_))
 
     return suite
+
+
+# def xmind_to_suite_v(xmind_file):
+#     #多层嵌套module的情况
+#     def parse_suite_list(suite_dict,parent=None):
+#         if is_summary(suite_dict):
+
+
 
 
 def xmind_to_suite_v2(xmind_file):

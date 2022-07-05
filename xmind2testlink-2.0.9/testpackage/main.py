@@ -20,7 +20,6 @@ import sys
 # from xmind2testlink2.xmind_parser import xmind_to_suite, xmind_to_flat_dict
 from testlink_parser import *
 from xmind_parser import xmind_to_suite, xmind_to_flat_dict
-from get_testcase_as_comments import is_summary, is_predict
 
 
 def xmind_to_testlink(xmind):
@@ -37,9 +36,10 @@ def xmind_to_json(xmind):
 
     return json_out
 
+
 def xmind_to_excel(xmind):
-    excel_out =xmind[:-5]+'.xlsx'
-    with open(excel_out,'w',encoding='utf8') as f:
+    excel_out = xmind[:-5] + '.xlsx'
+    with open(excel_out, 'w', encoding='utf8') as f:
         f.write(xmind_to_excel(xmind))
     return excel_out
 
@@ -51,7 +51,7 @@ def main():
         if len(sys.argv) == 3 and sys.argv[2] == '-json':
             file_out = xmind_to_json(xmind)
         elif len(sys.argv) == 3 and sys.argv[2] == '-.xls':
-            file_out = xmin_to_excel(xmind)
+            file_out = xmind_to_excel(xmind)
         else:
             file_out = xmind_to_testlink(xmind)
 

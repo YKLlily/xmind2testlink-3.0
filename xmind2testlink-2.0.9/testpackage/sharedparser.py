@@ -1,8 +1,9 @@
 from xmindparser import xmind_to_dict, config
 
-from datatype import TestCase, TestStep, cache
+from datatype import TestCase, TestStep, cache,TestSuite
 
-from get_testcase_as_comments import *
+from get_comments import *
+
 
 config['hideEmptyValue'] = False
 _config = {'sep': ' ',
@@ -223,18 +224,21 @@ def parse_testcase(testcase_dict, parent=None):
 
     steps_node = testcase_dict.get('topics', None)
 
-    if steps_node:
-        step_num=1
-        for step in steps_node:
-            if is_summary(step):
-                testcase.summary = get_titles_params(step)
-            elif is_predict(step):
-                testcase.preconditions = get_titles_params(step)
-            else:
-                #testcase.steps = parse_steps(steps_node)
-                testcase.steps.append(parse_step(step))
-                testcase.steps[step_num - 1].number = step_num
-                step_num = step_num + 1
+    #if steps_node:
+    if steps_node is None:
+        return testcase
+
+    step_num=1
+    for step in steps_node:
+        if is_summary(step):
+            testcase.summary = get_titles_params(step)
+        elif is_predict(step):
+            testcase.preconditions = get_titles_params(step)
+        else:
+            #testcase.steps = parse_steps(steps_node)
+            testcase.steps.append(parse_step(step))
+            testcase.steps[step_num - 1].number = step_num
+            step_num = step_num + 1
 
     return testcase
 
@@ -245,6 +249,7 @@ def parse_testcase(testcase_dict, parent=None):
 
 
 def build_suite_name(suite):
-    t = suite.get('title')
-    result = t.replace("module", '')
-    return result
+    print(suite)
+    t = suite.name.replace("module", '')
+    TestSuite.change_name(suite, t)
+    return suite
